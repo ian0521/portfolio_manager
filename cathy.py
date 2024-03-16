@@ -25,7 +25,8 @@ class cathy:
             "xpath",
             "//*[@id='divSystemLoginMsg']/div/div/div[2]/div[2]/button"
         )
-        check_button.click()
+        if check_button.text:
+            check_button.click()
 
         id = self.driver.find_element(
             "xpath",
