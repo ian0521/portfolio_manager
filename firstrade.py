@@ -5,7 +5,7 @@ import time
 import pandas as pd
 from bs4 import BeautifulSoup
 
-class UsStock:
+class firstrade:
     def __init__(self, username, password, code):
         self.username = username
         self.password = password
@@ -77,6 +77,11 @@ class UsStock:
             "xpath",
             "//*[@id='myaccount_menu']/li[2]/a/span"
         ).click()
+        cash = self.driver.find_element(
+            "xpath",
+            "//*[@id='maincontent']/div/table/tbody/tr/td[1]/div/div[2]/table[1]/tbody/tr[1]/td[1]"
+        ).text.replace("$", "").strip()
+        cash = float(cash)
         self.sleep(3)
 
         html = self.driver.page_source
@@ -99,7 +104,7 @@ class UsStock:
             }
             df = df._append(dt, ignore_index=True)
         
-        return df
+        return df, cash
 
     def calculate_total_pnl(self, df):
         total_pnl = 0
@@ -110,7 +115,7 @@ class UsStock:
             else:
                 total_pnl -= value
         return total_pnl
-    
+
     def close_driver(self):
         self.driver.close()
 
@@ -121,11 +126,15 @@ if __name__ == "__main__":
     parser.add_argument("--code", type=str)
     args = parser.parse_args()
 
-    scraper = UsStock(args.username, args.password, args.code)
+    scraper = firstrade(args.username, args.password, args.code)
     scraper.login()
-    account_info = scraper.info()
+    account_info, cash = scraper.info()
     print(account_info)
     total_pnl = scraper.calculate_total_pnl(account_info)
     print(f"Total PnL: {total_pnl}")
     print(f"Total PnL %: {round(total_pnl / account_info.cost.str.replace(',', '').astype(float).sum() * 100, 2)}")
+    total_cap = account_info.cap.str.replace(',', '').astype(float).sum()
+    print(f"Total Cap: {total_cap}")
+    print(f"Total Cash: {cash}")
+    print(f"Total Asset: {total_cap + cash}")
     scraper.close_driver()
