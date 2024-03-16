@@ -20,7 +20,7 @@ class cathy:
 
     def login(self):
         self.driver.get("https://cathaybk.com.tw/MyBank/Quicklinks/Home/Login")
-        self.sleep(2)
+        self.sleep(1)
         check_button = self.driver.find_element(
             "xpath",
             "//*[@id='divSystemLoginMsg']/div/div/div[2]/div[2]/button"
