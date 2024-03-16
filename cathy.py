@@ -51,12 +51,25 @@ class cathy:
         ).click()
 
     def info(self):
-        html = self.driver.page_source
-        soup = BeautifulSoup(html, "html.parser")
-        element = WebDriverWait(self.driver, 10).until(
+        # cash
+        html_cash = self.driver.page_source
+        soup_cash = BeautifulSoup(html_cash, "html.parser")
+        cash = WebDriverWait(self.driver, 10).until(
             EC.visibility_of_element_located((By.ID, "TD-balance"))
-        )
-        return int(element.text.replace(',', '').strip())
+        ).text.replace(",", "").strip()
+
+        # stock
+        self.driver.find_element(
+            "xpath",
+            "//*[@id='tabFUND']"
+        ).click()
+        html_stock = self.driver.page_source
+        soup_stock = BeautifulSoup(html_stock, "html.parser")
+        stock = WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((By.ID, "FUND-balance"))
+        ).text.replace(",", "").strip()
+
+        return int(cash), int(stock)
 
     def close_driver(self):
         self.driver.close()
@@ -70,6 +83,8 @@ if __name__ == "__main__":
 
     scraper = cathy(args.id, args.username, args.password)
     scraper.login()
-    asset = scraper.info()
-    print(f"Total Asset on Cathy: {asset}")
+    cash, stock = scraper.info()
+    print(f"Total Cash on Cathy: {cash}")
+    print(f"Total Stock on Cathy: {stock}")
+    print(f"Total Asset on Cathy: {cash+stock}")
     scraper.close_driver()
