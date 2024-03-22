@@ -55,6 +55,14 @@ class cathy:
         # cash
         html_cash = self.driver.page_source
         soup_cash = BeautifulSoup(html_cash, "html.parser")
+        self.sleep(1)
+        check_button = self.driver.find_element(
+            "xpath",
+            "//*[@id='_Cancel']"
+        )
+        if check_button.text:
+            check_button.click()
+
         cash = WebDriverWait(self.driver, 10).until(
             EC.visibility_of_element_located((By.ID, "TD-balance"))
         ).text.replace(",", "").strip()
