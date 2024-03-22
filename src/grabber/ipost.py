@@ -1,21 +1,15 @@
 from selenium import webdriver
 import argparse
-import time
-import pandas as pd
 from bs4 import BeautifulSoup
 import base64
 import ddddocr
+from asset import Asset
 
 
-class ipost:
-    def __init__(self, id, username, password):
-        self.id = id
-        self.username = username
-        self.password = password
-        self.driver = webdriver.Chrome()
-
-    def sleep(self, range):
-        time.sleep(range)
+class Ipost(Asset):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.id = kwargs.get("id")
 
     def check_num(self, catch):
         for idx, val in enumerate(catch):
@@ -99,7 +93,11 @@ if __name__ == "__main__":
     parser.add_argument("--password", type=str)
     args = parser.parse_args()
 
-    scraper = ipost(args.id, args.username, args.password)
+    scraper = Ipost(
+        id=args.id,
+        username=args.username,
+        password=args.password
+    )
     scraper.login()
     cash = scraper.info()
     print(f"Total Cash on Ipost: {cash}")

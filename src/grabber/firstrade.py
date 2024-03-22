@@ -1,19 +1,14 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import argparse
-import time
 import pandas as pd
 from bs4 import BeautifulSoup
+from asset import Asset
 
-class firstrade:
-    def __init__(self, username, password, code):
-        self.username = username
-        self.password = password
-        self.code = code
-        self.driver = webdriver.Chrome()
-
-    def sleep(self, range):
-        time.sleep(range)
+class Firstrade(Asset):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.code = kwargs.get("code")
 
     def login(self):
         self.driver.get("https://www.firstrade.com/")
@@ -126,7 +121,7 @@ if __name__ == "__main__":
     parser.add_argument("--code", type=str)
     args = parser.parse_args()
 
-    scraper = firstrade(args.username, args.password, args.code)
+    scraper = Firstrade(username=args.username, password=args.password, code=args.code)
     scraper.login()
     account_info, cash = scraper.info()
     print(account_info)

@@ -4,19 +4,13 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import argparse
-import time
-import pandas as pd
 from bs4 import BeautifulSoup
+from asset import Asset
 
-class cathy:
-    def __init__(self, id, username, password):
-        self.id = id
-        self.username = username
-        self.password = password
-        self.driver = webdriver.Chrome()
-
-    def sleep(self, range):
-        time.sleep(range)
+class Cathy(Asset):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.id = kwargs.get("id")
 
     def login(self):
         self.driver.get("https://cathaybk.com.tw/MyBank/Quicklinks/Home/Login")
@@ -90,7 +84,11 @@ if __name__ == "__main__":
     parser.add_argument("--password", type=str)
     args = parser.parse_args()
 
-    scraper = cathy(args.id, args.username, args.password)
+    scraper = Cathy(
+        id=args.id, 
+        username=args.username, 
+        password=args.password
+    )
     scraper.login()
     cash, stock = scraper.info()
     print(f"Total Cash on Cathy: {cash}")
