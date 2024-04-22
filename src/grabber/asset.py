@@ -32,4 +32,4 @@ class Asset:
         return True
 
 if __name__ == '__main__':
-    scraper = asset()
+    scraper = Asset()
