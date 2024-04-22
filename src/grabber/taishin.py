@@ -4,95 +4,95 @@ import ddddocr
 import argparse
 
 class Taishin(Asset):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.id = kwargs.get("id")
-
-    def check_num(self, catch):
-        for idx, val in enumerate(catch):
-            if val not in ''.join(str(num) for num in range(10)):
-                if val.lower() == 'o':
-                    catch = catch[:idx] + '0' + catch[idx+1:]
-                else:
-                    return False
-            return True
+    def __init__(self, arg):
+        super().__init__(arg)
 
     def login(self):
-        self.driver.get("https://my.taishinbank.com.tw/TIBNetBank/")
-        self.sleep(3)
+        self.driver.get("https://richart.tw/WebBank/users/login?lang=zh-tw")
+        self.sleep(5)
         
         id = self.driver.find_element(
             "xpath",
-            "//*[@id='app']/div/div[2]/div[2]/div[1]/div/div/div[1]/div[1]/div"
+            "//*[@id='userId']/input"
         )
         id.send_keys(self.id)
 
         username = self.driver.find_element(
             "xpath",
-            "//*[@id='app']/div/div[2]/div[2]/div[1]/div/div/div[1]/div[3]/div/input"
+            "//*[@id='userName']/input"
         )
         username.send_keys(self.username)
-
+ 
         password = self.driver.find_element(
             "xpath",
-            "//*[@id='app']/div/div[2]/div[2]/div[1]/div/div/div[1]/div[4]/div/input"
+            "/html/body/app-root/div/app-users/div/app-login/main/div/div[1]/div/div[2]/div[1]/div[1]/form/div[1]/div/div[3]/div/input"
         )
         password.send_keys(self.password)
 
         catch = ""
-        while len(catch) != 6 or self.check_num(catch):
+        while not catch or not self.check_num(catch):
             img = self.driver.find_element(
                 "xpath",
-                "//*[@id='verify']/div/div/span/img"
+                "/html/body/app-root/div/app-users/div/app-login/main/div/div[1]/div/div[2]/div[1]/div[1]/form/div[1]/div/div[4]/div/div[2]/div"
             )
             img.screenshot("code.png")
-            ocr = ddddocr.classification(img)
+            ocr = ddddocr.DdddOcr()
             with open("code.png", "rb") as fp:
                 image = fp.read()
             catch = ocr.classification(image)
         code = self.driver.find_element(
             "xpath",
-            "//*[@id='verify']/div/input"
+            "/html/body/app-root/div/app-users/div/app-login/main/div/div[1]/div/div[2]/div[1]/div[1]/form/div[1]/div/div[4]/div/div[1]/div/input"
         )
         code.send_keys(catch)
         self.sleep(3)
         login_button = self.driver.find_element(
             "xpath",
-            "//*[@id='loginBtn']"
+            "/html/body/app-root/div/app-users/div/app-login/main/div/div[1]/div/div[2]/div[1]/div[1]/form/div[2]/button"
         )
-        login.button.click()
+        login_button.click()
         self.sleep(3)
 
-        notify_button = self.driver.find_element(
-            "xpath",
-            "//*[@id='__BVID__15___BV_modal_body_']/div[2]/div/button[2]"
-        )
-        notify_button.click()
-        self.sleep(3)
+        # notify_button = self.driver.find_element(
+        #     "xpath",
+        #     "/html/body/ngb-modal-window/div/div/onboard-modal/div[3]/div[1]/button"
+        # )
+        # if notify_button.text:
+        #     notify_button.click()
+        # self.sleep(3)
 
     def info(self):
-        cash = int(self.driver.find_element(
+        show_number = self.driver.find_element(
             "xpath",
-            "//*[@id='app']/div/div[3]/div/div[4]/table/tbody/tr/td[1]"
-        ))
-        return cash
+            "//*[@id='toggleShowAmount']/i[1]"
+        )
+        show_number.click()
+
+        cash = self.driver.find_element(
+            "xpath",
+            "//*[@id='first-element-introduction']/div[1]/div[2]/div"
+        ).text.replace(",", "").strip()[1:]
+        return int(cash)
 
     def close_driver(self):
+        logout_button = self.driver.find_element(
+            "xpath",
+            "/html/body/app-root/div/app-dashboard/richart-header/header/div/div/nav/div[2]/div/a"
+        )
+        logout_button.click()
+        comfirm_buttom = self.driver.find_element(
+            "xpath",
+            "/html/body/ngb-modal-window/div/div/app-modal/div[2]/div[2]/button"
+        )
+        comfirm_buttom.click()
         self.driver.close()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("USER INFO")
-    parser.add_argument("--id", type=str)
-    parser.add_argument("--username", type=str)
-    parser.add_argument("--password", type=str)
     args = parser.parse_args()
-
-    scraper = Taishin(
-        id=args.id,
-        username=args.username,
-        password=args.password
-    )
+    section = "TAISHIN"
+    scraper = Taishin(section)
     scraper.login()
     cash = scraper.info()
     print(f"Total Cash on Taishin: {cash}")
-    scraper.close()
+    scraper.close_driver()
