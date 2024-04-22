@@ -7,18 +7,8 @@ from asset import Asset
 
 
 class Ipost(Asset):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.id = kwargs.get("id")
-
-    def check_num(self, catch):
-        for idx, val in enumerate(catch):
-            if val not in ''.join(str(num) for num in range(10)):
-                if val.lower() == 'o':
-                    catch = catch[:idx] + '0' + catch[idx+1:]
-                else:
-                    return False
-        return True
+    def __init__(self, arg):
+        super().__init__(arg)
 
     def login(self):
         self.driver.get("https://ipost.post.gov.tw/pst/home.html")
@@ -59,7 +49,7 @@ class Ipost(Asset):
                 "//*[@id='tab1']/div[14]/img"
             )
             img.screenshot("code.png")
-            ocr = ddddocr.DdddOcr(show_ad=False)
+            ocr = ddddocr.DdddOcr()
             with open("code.png", "rb") as fp:
                 image = fp.read()
             catch = ocr.classification(image)
@@ -88,16 +78,9 @@ class Ipost(Asset):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("USER INFO")
-    parser.add_argument("--id", type=str)
-    parser.add_argument("--username", type=str)
-    parser.add_argument("--password", type=str)
     args = parser.parse_args()
-
-    scraper = Ipost(
-        id=args.id,
-        username=args.username,
-        password=args.password
-    )
+    section = "IPOST"
+    scraper = Ipost(section)
     scraper.login()
     cash = scraper.info()
     print(f"Total Cash on Ipost: {cash}")

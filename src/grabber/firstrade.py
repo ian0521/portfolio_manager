@@ -6,9 +6,8 @@ from bs4 import BeautifulSoup
 from asset import Asset
 
 class Firstrade(Asset):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.code = kwargs.get("code")
+    def __init__(self, arg):
+        super().__init__(arg)
 
     def login(self):
         self.driver.get("https://www.firstrade.com/")
@@ -78,7 +77,6 @@ class Firstrade(Asset):
         ).text.replace("$", "").strip()
         cash = float(cash)
         self.sleep(3)
-
         html = self.driver.page_source
         soup = BeautifulSoup(html, "html.parser")
         elem = soup.find("table", {"id": "positiontable"})
@@ -116,12 +114,9 @@ class Firstrade(Asset):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("USER INFO")
-    parser.add_argument("--username", type=str)
-    parser.add_argument("--password", type=str)
-    parser.add_argument("--code", type=str)
     args = parser.parse_args()
-
-    scraper = Firstrade(username=args.username, password=args.password, code=args.code)
+    section = "FIRSTRADE"
+    scraper = Firstrade(section)
     scraper.login()
     account_info, cash = scraper.info()
     print(account_info)

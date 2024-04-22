@@ -8,9 +8,8 @@ from bs4 import BeautifulSoup
 from asset import Asset
 
 class Cathy(Asset):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.id = kwargs.get("id")
+    def __init__(self, arg):
+        super().__init__(arg)
 
     def login(self):
         self.driver.get("https://cathaybk.com.tw/MyBank/Quicklinks/Home/Login")
@@ -79,16 +78,9 @@ class Cathy(Asset):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("USER INFO")
-    parser.add_argument("--id", type=str)
-    parser.add_argument("--username", type=str)
-    parser.add_argument("--password", type=str)
     args = parser.parse_args()
-
-    scraper = Cathy(
-        id=args.id, 
-        username=args.username, 
-        password=args.password
-    )
+    section = "CATHY"
+    scraper = Cathy(section)
     scraper.login()
     cash, stock = scraper.info()
     print(f"Total Cash on Cathy: {cash}")
