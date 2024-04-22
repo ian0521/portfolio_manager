@@ -53,14 +53,6 @@ class Taishin(Asset):
         login_button.click()
         self.sleep(3)
 
-        # notify_button = self.driver.find_element(
-        #     "xpath",
-        #     "/html/body/ngb-modal-window/div/div/onboard-modal/div[3]/div[1]/button"
-        # )
-        # if notify_button.text:
-        #     notify_button.click()
-        # self.sleep(3)
-
     def info(self):
         show_number = self.driver.find_element(
             "xpath",
