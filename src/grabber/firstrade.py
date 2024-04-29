@@ -74,7 +74,7 @@ class Firstrade(Asset):
         cash = self.driver.find_element(
             "xpath",
             "//*[@id='maincontent']/div/table/tbody/tr/td[1]/div/div[2]/table[1]/tbody/tr[1]/td[1]"
-        ).text.replace("$", "").strip()
+        ).text.replace(",", "").strip()[1:]
         cash = float(cash)
         self.sleep(3)
         html = self.driver.page_source
